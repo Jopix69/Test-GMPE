@@ -1,93 +1,100 @@
-import express from "express";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { createServer as createViteServer } from "vite";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 
-const currentDir = typeof __dirname !== "undefined" ? __dirname : path.dirname(fileURLToPath(import.meta.url));
-
-const app = express();
-const PORT = 3000;
-
-app.use(express.json());
-
-// In-memory + file-backed storage for Global Ranking
-interface ScoreEntry {
-  id: string;
-  studentName: string;
-  studentClass: string;
-  score: number;
-  levelReached: number;
-  totalTime: number; // in seconds
-  accuracy: number; // percentage
-  answersCorrect: number;
-  answersTotal: number;
-  date: string;
-}
-
-const DATA_DIR = path.join(process.cwd(), "data");
-const RANKING_FILE = path.join(DATA_DIR, "ranking.json");
-
-const DEFAULT_SCORES: ScoreEntry[] = [
+// server.ts
+var import_express = __toESM(require("express"), 1);
+var import_fs = __toESM(require("fs"), 1);
+var import_path = __toESM(require("path"), 1);
+var import_url = require("url");
+var import_vite = require("vite");
+var import_meta = {};
+var __filename = (0, import_url.fileURLToPath)(import_meta.url);
+var __dirname = import_path.default.dirname(__filename);
+var app = (0, import_express.default)();
+var PORT = 3e3;
+app.use(import_express.default.json());
+var DATA_DIR = import_path.default.join(process.cwd(), "data");
+var RANKING_FILE = import_path.default.join(DATA_DIR, "ranking.json");
+var DEFAULT_SCORES = [
   {
     id: "seed-1",
-    studentName: "Lucía Fernández",
-    studentClass: "4º ESO A",
+    studentName: "Luc\xEDa Fern\xE1ndez",
+    studentClass: "4\xBA ESO A",
     score: 3420,
     levelReached: 5,
     totalTime: 185,
     accuracy: 95,
     answersCorrect: 24,
     answersTotal: 25,
-    date: new Date(Date.now() - 3600000 * 2).toISOString(),
+    date: new Date(Date.now() - 36e5 * 2).toISOString()
   },
   {
     id: "seed-2",
-    studentName: "Alejandro Gómez",
-    studentClass: "1º Bachillerato B",
+    studentName: "Alejandro G\xF3mez",
+    studentClass: "1\xBA Bachillerato B",
     score: 3190,
     levelReached: 5,
     totalTime: 210,
     accuracy: 92,
     answersCorrect: 23,
     answersTotal: 25,
-    date: new Date(Date.now() - 3600000 * 5).toISOString(),
+    date: new Date(Date.now() - 36e5 * 5).toISOString()
   },
   {
     id: "seed-3",
-    studentName: "Marta Sánchez",
-    studentClass: "4º ESO B",
+    studentName: "Marta S\xE1nchez",
+    studentClass: "4\xBA ESO B",
     score: 2950,
     levelReached: 4,
     totalTime: 195,
     accuracy: 88,
     answersCorrect: 21,
     answersTotal: 24,
-    date: new Date(Date.now() - 3600000 * 12).toISOString(),
+    date: new Date(Date.now() - 36e5 * 12).toISOString()
   },
   {
     id: "seed-4",
     studentName: "Pablo Navarro",
-    studentClass: "3º ESO C",
+    studentClass: "3\xBA ESO C",
     score: 2780,
     levelReached: 4,
     totalTime: 230,
     accuracy: 85,
     answersCorrect: 19,
     answersTotal: 22,
-    date: new Date(Date.now() - 3600000 * 24).toISOString(),
+    date: new Date(Date.now() - 36e5 * 24).toISOString()
   },
   {
     id: "seed-5",
     studentName: "Carmen Morales",
-    studentClass: "1º Bachillerato A",
+    studentClass: "1\xBA Bachillerato A",
     score: 2640,
     levelReached: 4,
     totalTime: 245,
     accuracy: 84,
     answersCorrect: 18,
     answersTotal: 22,
-    date: new Date(Date.now() - 3600000 * 30).toISOString(),
+    date: new Date(Date.now() - 36e5 * 30).toISOString()
   },
   {
     id: "seed-6",
@@ -99,58 +106,48 @@ const DEFAULT_SCORES: ScoreEntry[] = [
     accuracy: 80,
     answersCorrect: 16,
     answersTotal: 20,
-    date: new Date(Date.now() - 3600000 * 48).toISOString(),
-  },
+    date: new Date(Date.now() - 36e5 * 48).toISOString()
+  }
 ];
-
-function loadScores(): ScoreEntry[] {
+function loadScores() {
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!import_fs.default.existsSync(DATA_DIR)) {
+      import_fs.default.mkdirSync(DATA_DIR, { recursive: true });
     }
-    if (fs.existsSync(RANKING_FILE)) {
-      const data = fs.readFileSync(RANKING_FILE, "utf-8");
+    if (import_fs.default.existsSync(RANKING_FILE)) {
+      const data = import_fs.default.readFileSync(RANKING_FILE, "utf-8");
       return JSON.parse(data);
     }
-    fs.writeFileSync(RANKING_FILE, JSON.stringify(DEFAULT_SCORES, null, 2), "utf-8");
+    import_fs.default.writeFileSync(RANKING_FILE, JSON.stringify(DEFAULT_SCORES, null, 2), "utf-8");
     return DEFAULT_SCORES;
   } catch (err) {
     console.error("Error loading scores, fallback to defaults", err);
     return DEFAULT_SCORES;
   }
 }
-
-function saveScores(scores: ScoreEntry[]) {
+function saveScores(scores) {
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!import_fs.default.existsSync(DATA_DIR)) {
+      import_fs.default.mkdirSync(DATA_DIR, { recursive: true });
     }
-    fs.writeFileSync(RANKING_FILE, JSON.stringify(scores, null, 2), "utf-8");
+    import_fs.default.writeFileSync(RANKING_FILE, JSON.stringify(scores, null, 2), "utf-8");
   } catch (err) {
     console.error("Error saving scores", err);
   }
 }
-
-let rankingList: ScoreEntry[] = loadScores();
-
-// API Routes
+var rankingList = loadScores();
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.json({ status: "ok", timestamp: (/* @__PURE__ */ new Date()).toISOString() });
 });
-
-// GET ranking with optional class filter
 app.get("/api/ranking", (req, res) => {
-  const filterClass = req.query.class as string | undefined;
+  const filterClass = req.query.class;
   let result = [...rankingList];
   if (filterClass && filterClass !== "all") {
     result = result.filter((entry) => entry.studentClass.toLowerCase() === filterClass.toLowerCase());
   }
-  // Sort by score DESC, then totalTime ASC
   result.sort((a, b) => b.score - a.score || a.totalTime - b.totalTime);
   res.json({ success: true, count: result.length, data: result });
 });
-
-// POST score update / registration
 app.post("/api/ranking", (req, res) => {
   try {
     const { studentName, studentClass, score, levelReached, totalTime, accuracy, answersCorrect, answersTotal } = req.body;
@@ -158,20 +155,13 @@ app.post("/api/ranking", (req, res) => {
       res.status(400).json({ error: "El nombre del alumno y la clase son obligatorios" });
       return;
     }
-
     const cleanName = String(studentName).trim();
     const cleanClass = String(studentClass).trim();
-
-    // Check if student already has a score in this class
     const existingIndex = rankingList.findIndex(
-      (entry) =>
-        entry.studentName.toLowerCase() === cleanName.toLowerCase() &&
-        entry.studentClass.toLowerCase() === cleanClass.toLowerCase()
+      (entry) => entry.studentName.toLowerCase() === cleanName.toLowerCase() && entry.studentClass.toLowerCase() === cleanClass.toLowerCase()
     );
-
-    const now = new Date().toISOString();
+    const now = (/* @__PURE__ */ new Date()).toISOString();
     if (existingIndex >= 0) {
-      // Keep highest score or update if new score is higher
       if (Number(score) >= rankingList[existingIndex].score) {
         rankingList[existingIndex] = {
           ...rankingList[existingIndex],
@@ -181,11 +171,11 @@ app.post("/api/ranking", (req, res) => {
           accuracy: Number(accuracy) || rankingList[existingIndex].accuracy,
           answersCorrect: Number(answersCorrect) || rankingList[existingIndex].answersCorrect,
           answersTotal: Number(answersTotal) || rankingList[existingIndex].answersTotal,
-          date: now,
+          date: now
         };
       }
     } else {
-      const newEntry: ScoreEntry = {
+      const newEntry = {
         id: `entry-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         studentName: cleanName,
         studentClass: cleanClass,
@@ -195,46 +185,38 @@ app.post("/api/ranking", (req, res) => {
         accuracy: Number(accuracy) || 0,
         answersCorrect: Number(answersCorrect) || 0,
         answersTotal: Number(answersTotal) || 0,
-        date: now,
+        date: now
       };
       rankingList.push(newEntry);
     }
-
-    // Sort rankings
     rankingList.sort((a, b) => b.score - a.score || a.totalTime - b.totalTime);
     saveScores(rankingList);
-
-    // Find student position
     const currentPosition = rankingList.findIndex(
       (e) => e.studentName.toLowerCase() === cleanName.toLowerCase() && e.studentClass.toLowerCase() === cleanClass.toLowerCase()
     ) + 1;
-
     res.json({ success: true, position: currentPosition, totalStudents: rankingList.length });
   } catch (error) {
     console.error("Error saving score:", error);
-    res.status(500).json({ error: "Error al guardar la puntuación" });
+    res.status(500).json({ error: "Error al guardar la puntuaci\xF3n" });
   }
 });
-
-// Vite middleware / production serving
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
+    const vite = await (0, import_vite.createServer)({
       server: { middlewareMode: true },
-      appType: "spa",
+      appType: "spa"
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
+    const distPath = import_path.default.join(process.cwd(), "dist");
+    app.use(import_express.default.static(distPath));
     app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      res.sendFile(import_path.default.join(distPath, "index.html"));
     });
   }
-
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Turbine 3D & Betz app running on http://localhost:${PORT}`);
   });
 }
-
 startServer();
+//# sourceMappingURL=server.cjs.map

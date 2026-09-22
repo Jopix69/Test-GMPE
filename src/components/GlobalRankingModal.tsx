@@ -22,26 +22,112 @@ export const GlobalRankingModal: React.FC<GlobalRankingModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [classesList, setClassesList] = useState<string[]>([]);
 
+  const FALLBACK_SCORES: ScoreEntry[] = [
+    {
+      id: "seed-1",
+      studentName: "Lucía Fernández",
+      studentClass: "4º ESO A",
+      score: 3420,
+      levelReached: 5,
+      totalTime: 185,
+      accuracy: 95,
+      answersCorrect: 24,
+      answersTotal: 25,
+      date: new Date().toISOString(),
+    },
+    {
+      id: "seed-2",
+      studentName: "Alejandro Gómez",
+      studentClass: "1º Bachillerato B",
+      score: 3190,
+      levelReached: 5,
+      totalTime: 210,
+      accuracy: 92,
+      answersCorrect: 23,
+      answersTotal: 25,
+      date: new Date().toISOString(),
+    },
+    {
+      id: "seed-3",
+      studentName: "Marta Sánchez",
+      studentClass: "4º ESO B",
+      score: 2950,
+      levelReached: 4,
+      totalTime: 240,
+      accuracy: 88,
+      answersCorrect: 22,
+      answersTotal: 25,
+      date: new Date().toISOString(),
+    },
+    {
+      id: "seed-4",
+      studentName: "Carlos Navarro",
+      studentClass: "3º ESO A",
+      score: 2780,
+      levelReached: 4,
+      totalTime: 195,
+      accuracy: 85,
+      answersCorrect: 21,
+      answersTotal: 25,
+      date: new Date().toISOString(),
+    },
+    {
+      id: "seed-5",
+      studentName: "Elena Ruiz",
+      studentClass: "1º Bachillerato A",
+      score: 2640,
+      levelReached: 3,
+      totalTime: 220,
+      accuracy: 84,
+      answersCorrect: 20,
+      answersTotal: 25,
+      date: new Date().toISOString(),
+    },
+  ];
+
   const fetchRankings = async () => {
     setIsLoading(true);
+    let loadedData: ScoreEntry[] = [];
     try {
       const url = selectedClass && selectedClass !== "all" ? `/api/ranking?class=${encodeURIComponent(selectedClass)}` : "/api/ranking";
       const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
-        if (json.data) {
-          setRankings(json.data);
-
-          // Extract unique classes
-          const uniqueClasses = Array.from(new Set(json.data.map((item: ScoreEntry) => item.studentClass))) as string[];
-          setClassesList(uniqueClasses);
+        if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+          loadedData = json.data;
         }
       }
-    } catch (err) {
-      console.warn("Could not fetch server ranking, using local fallback", err);
-    } finally {
-      setIsLoading(false);
+    } catch {
+      // Static host fallback (e.g. GitHub Pages)
     }
+
+    if (!loadedData || loadedData.length === 0) {
+      try {
+        const saved = localStorage.getItem("turbine_global_rankings");
+        if (saved) {
+          loadedData = JSON.parse(saved);
+        } else {
+          loadedData = FALLBACK_SCORES;
+          localStorage.setItem("turbine_global_rankings", JSON.stringify(FALLBACK_SCORES));
+        }
+      } catch {
+        loadedData = FALLBACK_SCORES;
+      }
+    }
+
+    if (selectedClass && selectedClass !== "all") {
+      loadedData = loadedData.filter((item) => item.studentClass.toLowerCase() === selectedClass.toLowerCase());
+    }
+
+    // Sort by score descending
+    loadedData.sort((a, b) => b.score - a.score);
+
+    setRankings(loadedData);
+
+    // Extract unique classes
+    const uniqueClasses = Array.from(new Set(loadedData.map((item: ScoreEntry) => item.studentClass))) as string[];
+    setClassesList(uniqueClasses);
+    setIsLoading(false);
   };
 
   useEffect(() => {

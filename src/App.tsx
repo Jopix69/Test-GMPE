@@ -144,6 +144,39 @@ export default function App() {
         localStorage.setItem("turbine_student_profile", JSON.stringify(updated));
       }
       localStorage.setItem("turbine_saved_score", String(currentScore));
+
+      // Also update local rankings cache for GitHub Pages static hosting
+      try {
+        const savedRankingsStr = localStorage.getItem("turbine_global_rankings");
+        let list = savedRankingsStr ? JSON.parse(savedRankingsStr) : [];
+        const existingIdx = list.findIndex(
+          (item: any) =>
+            item.studentName.toLowerCase() === studProfile.name.toLowerCase() &&
+            item.studentClass.toLowerCase() === studProfile.studentClass.toLowerCase()
+        );
+        const newEntry = {
+          id: existingIdx >= 0 ? list[existingIdx].id : `local-${Date.now()}`,
+          studentName: studProfile.name,
+          studentClass: studProfile.studentClass,
+          score: currentScore,
+          levelReached: level,
+          totalTime: totalTimeSecs,
+          accuracy,
+          answersCorrect: correctCount,
+          answersTotal: totalCount,
+          date: new Date().toISOString(),
+        };
+        if (existingIdx >= 0) {
+          if (currentScore >= list[existingIdx].score) {
+            list[existingIdx] = newEntry;
+          }
+        } else {
+          list.push(newEntry);
+        }
+        localStorage.setItem("turbine_global_rankings", JSON.stringify(list));
+      } catch {
+        // ignore
+      }
     } catch (e) {
       console.warn("Could not sync with ranking API:", e);
     }
